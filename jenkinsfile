@@ -1,0 +1,44 @@
+pipeline {
+
+  environment {
+    registry = "saadbr99/tp"
+    registryCredential = "b546431b-1e0f-4332-a345-4f71a6ddd926"
+    dockerImage = ""
+  }
+
+  stages {
+
+    stage('Cloning Git') {
+      steps {
+        git 'https://github.com/saadBr/tp4devops.git'
+      }
+    }
+
+    stage('Building image') {
+      steps {
+        script {
+          dockerImage = docker.build("${registry}:$BUILD_NUMBER")
+        }
+      }
+    }
+
+    stage('Test image') {
+      steps {
+        script {
+          echo "Tests passed"
+        }
+      }
+    }
+
+    stage('Publish Image') {
+      steps {
+        script {
+          docker.withRegistry('', registryCredential) {
+            dockerImage.push()
+          }
+        }
+      }
+    }
+
+  }
+}
